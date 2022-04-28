@@ -39,7 +39,7 @@ namespace StaffAssignmentUpdate.Controller
             HttpClient httpClient = new HttpClient
             {
                 BaseAddress = new Uri(Environment.GetEnvironmentVariable("OrganizationEndpoint")),
-                Timeout = new TimeSpan(0, 10, 0)
+                Timeout = new TimeSpan(0, 5, 0)
             };
             httpClient.DefaultRequestHeaders.Add("OData-MaxVersion", "4.0");
             httpClient.DefaultRequestHeaders.Add("OData-Version", "4.0");

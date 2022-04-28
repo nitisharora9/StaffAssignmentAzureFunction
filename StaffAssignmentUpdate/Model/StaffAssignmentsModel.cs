@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace StaffAssignmentUpdate.Model
 {
-    public class StaffAssignmentsMode
+    public class StaffAssignmentsModel
     {
         public string status;
         public string staffStatus;
         public string empDiscipline;
-        public string patientValue;
+        public string patientID;
         public string patientPrimary;
     }
 }

@@ -30,7 +30,7 @@ namespace StaffAssignmentUpdate.Controller
 
         public async Task<bool> patchDataToCRMAsync(string collection, string recordId, JObject configEntity)
         {
-            Task<bool> updateAlertDate = DataProcessor.UpdateAsync("vit_alertses", recordId, configEntity);
+            Task<bool> updateAlertDate = DataProcessor.UpdateAsync(collection, recordId, configEntity);
             bool resultUpdate = await updateAlertDate;
             return resultUpdate;
         }       
