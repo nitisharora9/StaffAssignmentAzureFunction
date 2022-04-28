@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "StaffAssignmentUpdate": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ClientSecret": "_8HfixmjAqwH5-CNftFW_Hu9T3O2tCcS-f",
+        "OrganizationEndpoint": "https://epd.crm.dynamics.com/",
+        "TenantId": "15cd90fb-38a7-43b7-9338-a5996ab8deb3",
+        "AadInstance": "https://login.microsoftonline.com/",
+        "ClientId": "a11e4b40-56bd-46a1-8175-1a447307c60b"
+      }
+    }
+  }
+}
