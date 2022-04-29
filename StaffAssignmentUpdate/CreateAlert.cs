@@ -30,6 +30,7 @@ namespace StaffAssignmentUpdate
 
             var jObject = JObject.Parse(json);
             string staffAssignmentID = jObject["StaffAssignmentID"].ToString();
+            string emmyEntitiyHelperID = jObject["EmmyEntityHelperID"].ToString();
 
             log.LogInformation("Fetching Staff Assignment : " + staffAssignmentID);
 
@@ -79,11 +80,22 @@ namespace StaffAssignmentUpdate
 
                             foreach (var tmg in tmgList)
                             {
-                                bool success = await createNoCoreTeamAssignmentAlert(dataController, tmg.contactID, staffAssignment.patientID, staffAssignment.empDiscipline);
+                                bool success = await createNoCoreTeamAssignmentAlert(dataController, tmg.contactID, staffAssignment.patientID, staffAssignment.empDiscipline, log);
                                 
                                 if(success)
                                 {
                                     log.LogInformation("Success! Alert created!");
+                                    bool operationCompleted = await completeOperation(dataController, emmyEntitiyHelperID, log);
+
+                                    if(operationCompleted)
+                                    {
+                                        log.LogInformation("Operation Completed!");
+                                    }
+
+                                    else
+                                    {
+                                        log.LogInformation("Operation not completed!");
+                                    }
                                 }
 
                                 else
@@ -179,22 +191,52 @@ namespace StaffAssignmentUpdate
             return false;
         }
 
-        public static async Task<bool> createNoCoreTeamAssignmentAlert(DataController dataController, string contactID, string patientID, string empDiscipline)
+        public static async Task<bool> createNoCoreTeamAssignmentAlert(DataController dataController, string contactID, string patientID, string empDiscipline, ILogger log)
         {
-            JObject newAlertConfig = new JObject();
-            string currentUTCDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
-            newAlertConfig.Add("vit_alertcreated", currentUTCDate);                   
-            newAlertConfig.Add("vit_alertdescription", "Patient assignment of one core team clinician (" + empDiscipline + ")");
-            newAlertConfig.Add("vit_alerttitle", "No Core Team Assignment");
-            newAlertConfig.Add("vit_alerttimeframe", 909890002);
-            newAlertConfig.Add("vit_notificationtype", 909890001); // Alert Type
-            newAlertConfig.Add("vit_disciplinecodeimpacted", empDiscipline);
-            newAlertConfig.Add("vit_Clinician@odata.bind", "/contacts(" + contactID + ")");
-            newAlertConfig.Add("vit_PatientID@odata.bind", "/vit_patients(" + patientID + ")");
+            try
+            {
+                JObject newAlertConfig = new JObject();
+                string currentUTCDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
+                newAlertConfig.Add("vit_alertcreated", currentUTCDate);
+                newAlertConfig.Add("vit_alertdescription", "Patient assignment of one core team clinician (" + empDiscipline + ")");
+                newAlertConfig.Add("vit_alerttitle", "No Core Team Assignment");
+                newAlertConfig.Add("vit_alerttimeframe", 909890002);
+                newAlertConfig.Add("vit_notificationtype", 909890001); // Alert Type
+                newAlertConfig.Add("vit_disciplinecodeimpacted", empDiscipline);
+                newAlertConfig.Add("vit_Clinician@odata.bind", "/contacts(" + contactID + ")");
+                newAlertConfig.Add("vit_PatientID@odata.bind", "/vit_patients(" + patientID + ")");
 
-            bool createNewAlert = await dataController.postDataToCRMAsync("vit_alertses", newAlertConfig);
+                bool createNewAlert = await dataController.postDataToCRMAsync("vit_alertses", newAlertConfig);
 
-            return createNewAlert;
+                return createNewAlert;
+            }
+            
+            catch (Exception ex)
+            {
+                log.LogInformation($"Failed with exception {ex}");
+                return false;
+            }
+        }
+
+        public static async Task<bool> completeOperation(DataController dataController, string emmyEntitiyHelperID, ILogger log)
+        {
+            try
+            {
+                JObject configEntity = new JObject {
+                            {"vit_operationcompleted", 909890000}
+                };
+
+                bool result = await dataController.patchDataToCRMAsync("vit_emmyentityhelpers", emmyEntitiyHelperID, configEntity);
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                log.LogInformation($"Failed with exception {ex}");
+                return false;
+            }
+
+            return false;
         }
     }
 }

@@ -30,13 +30,15 @@ namespace StaffAssignmentUpdate
             Entity preEntityImage = (Entity)cdsContext.PreEntityImages["PermitImage"];
             string preStateCode = preEntityImage.FormattedValues["statecode"].ToString();
             string staffAssignmentId = preEntityImage.Attributes["vit_staffassignmentid"].ToString();
+            string preStaffStatus = preEntityImage.Attributes["vit_staffstatus"].ToString();
 
             Entity postEntityImage = (Entity)cdsContext.PostEntityImages["PermitImage"];
             string postStateCode = postEntityImage.FormattedValues["statecode"].ToString();
+            string postStaffStatus = postEntityImage.Attributes["vit_staffstatus"].ToString();
 
             try
             {
-                if (preStateCode != null && postStateCode != null && preStateCode == "Active" && postStateCode == "Inactive")
+                if ((!String.IsNullOrEmpty(preStateCode) && !String.IsNullOrEmpty(postStateCode) && preStateCode == "Active" && postStateCode == "Inactive") || (!String.IsNullOrEmpty(preStaffStatus) && !String.IsNullOrEmpty(postStaffStatus) && preStaffStatus == "Active" && postStaffStatus == "Inactive"))
                 {
                     log.LogInformation("Creating record in EmmyEntityHelper");
                     JObject emmyEntityHelperRecord = new JObject {
