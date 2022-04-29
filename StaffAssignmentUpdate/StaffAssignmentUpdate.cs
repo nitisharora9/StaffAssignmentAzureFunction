@@ -25,9 +25,13 @@ namespace StaffAssignmentUpdate
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             var json = await req.Content.ReadAsStringAsync();
-            RemoteExecutionContext cdsContext = GetContext(json);
+            var jObj = JObject.Parse(json);
+            log.LogInformation("PreEntity Image : " + jObj["PreEntityImages"].ToString());
+            log.LogInformation("PostEntity Image : " + jObj["PostEntityImages"].ToString());
 
+            RemoteExecutionContext cdsContext = GetContext(json);        
             Entity preEntityImage = (Entity)cdsContext.PreEntityImages["PermitImage"];
+            
             string preStateCode = preEntityImage.FormattedValues["statecode"].ToString();
             string staffAssignmentId = preEntityImage.Attributes["vit_staffassignmentid"].ToString();
             string preStaffStatus = preEntityImage.Attributes["vit_staffstatus"].ToString();
@@ -36,6 +40,7 @@ namespace StaffAssignmentUpdate
             string postStateCode = postEntityImage.FormattedValues["statecode"].ToString();
             string postStaffStatus = postEntityImage.Attributes["vit_staffstatus"].ToString();
 
+            
             try
             {
                 if ((!String.IsNullOrEmpty(preStateCode) && !String.IsNullOrEmpty(postStateCode) && preStateCode == "Active" && postStateCode == "Inactive") || (!String.IsNullOrEmpty(preStaffStatus) && !String.IsNullOrEmpty(postStaffStatus) && preStaffStatus == "Active" && postStaffStatus == "Inactive"))
